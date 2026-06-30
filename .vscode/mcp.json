@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"my-http-server": {
+			"url": "http://localhost:8080/mcp/sample",
+			"type": "http"
+		},
+	},
+	"inputs": []
+}
