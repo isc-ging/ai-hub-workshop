@@ -1,0 +1,7 @@
+host = "localhost"
+web_port = 52773
+namespace = "IRISAPP"
+scheme = "http"
+container = "ai-hub-code-demo-iris-1"
+username = "_SYSTEM"
+password = "SYS"

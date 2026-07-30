@@ -1,4 +1,4 @@
-ARG IMAGE=docker.iscinternal.com/docker-intersystems/intersystems/iris-community:2026.3.0AI.108.0
+ARG IMAGE=docker.iscinternal.com/docker-intersystems/intersystems/iris-community:2026.3.0AI.126.0
 FROM $IMAGE 
 
 WORKDIR /home/irisowner/dev
@@ -14,6 +14,8 @@ ENV PATH "/usr/irissys/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb
 
 COPY requirements.txt /home/irisowner/dev/requirements.txt
 
+COPY merge.cpf merge.cpf
+
 ENV PYTHONPATH="/usr/irissys/lib/python"
 ENV PATH "/usr/irissys/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/irisowner/bin"
 WORKDIR /home/irisowner/dev
@@ -24,5 +26,6 @@ RUN  python3 -m venv "/home/irisowner/.venvs/mcp-tools" && \
 
 RUN --mount=type=bind,src=.,dst=. \
     iris start IRIS && \
+    iris merge merge.cpf && \
 	iris session IRIS < iris.script && \
     iris stop IRIS quietly
