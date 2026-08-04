@@ -1,0 +1,55 @@
+[{
+  "input": "../code-demo-scripts/Agent.cls",
+  "output": "src/Warehouse/AI/Agent.cls",
+  "speed": 30,
+  "lines": [
+    { "line": 1, "breakBefore": 1 },
+    { "line": 2,"breakBefore":1 },
+    { "line": 5, "breakBefore": 1 },
+    { "line": 8, "breakBefore": 1 },
+    { "line": 11, "breakBefore": 1 },
+    {"line": 13, "breakBefore": 1, "speed":50},
+    {"line":18, "breakBefore":1, "speed":30},
+    {"line": 21, "breakBefore": 1, "speed":20}, 
+    {"line":27, "breakBefore":1, "speed":30}
+  ]
+},
+{
+  "input": "../code-demo-scripts/Tools.cls",
+  "output": "src/Warehouse/AI/Tools.cls",
+  "speed": 30,
+  "lines": [
+    { "line": 1, "breakBefore": 1, "speed":20 },
+    { "line": 2, "breakBefore": 1, "speed":30 },
+    { "line": 4, "breakBefore": 1 },
+    { "line": 13, "breakBefore": 1 },
+    { "line": 22, "breakBefore": 1 },
+    { "line": 34, "breakBefore": 1 },
+    {"line": 57, "breakBefore": 1}
+  ]
+}, 
+
+{
+  "input": "../code-demo-scripts/MCP.cls",
+  "output": "src/Warehouse/AI/MCP.cls",
+  "speed": 30,
+  "lines": [
+    { "line": 1, "breakBefore": 1, "speed":20 },
+    { "line": 2, "breakBefore": 1, "speed":30 }
+  ]
+},
+
+{
+  "input": "../code-demo-scripts/ToolSet.cls",
+  "output": "src/Warehouse/AI/ToolSet.cls",
+  "speed": 50,
+  "lines": [
+    { "line": 1, "breakBefore": 1 },
+    { "line": 4, "breakBefore": 1 },
+    { "line": 11, "breakBefore": 1 },
+    { "line": 21, "breakBefore": 1 },
+    { "line": 23, "breakBefore": 1 }
+     
+  ]
+}
+]

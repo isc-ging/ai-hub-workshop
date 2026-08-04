@@ -1,4 +1,4 @@
-Class Demo.Interop.OrderRequest Extends Ens.Request
+Class Warehouse.Interop.OrderRequest Extends Ens.Request
 {
 
 Property ProductId As %Integer [ Required ];

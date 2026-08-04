@@ -7,8 +7,8 @@
       <Description>Warehouse Agent Demo</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
-      <Resource Name="Demo.PKG"/>
-      <Invoke Method="PopulateAll" Class="Demo.Utils"/>
+      <Resource Name="Warehouse.PKG"/>
+      <Invoke Method="PopulateAll" Class="Warehouse.Utils"/>
     </Module>
   </Document>
 </Export>

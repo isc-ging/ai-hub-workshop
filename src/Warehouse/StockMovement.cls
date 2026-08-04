@@ -1,7 +1,7 @@
-Class Demo.StockMovement Extends %Persistent
+Class Warehouse.StockMovement Extends %Persistent
 {
 
-Property Product As Demo.Product [ Required ];
+Property Product As Warehouse.Product [ Required ];
 
 Property Delta As %Integer [ Required ];
 
@@ -40,11 +40,11 @@ Storage Default
 <Value>Reporter</Value>
 </Value>
 </Data>
-<DataLocation>^Demo.StockMovementD</DataLocation>
+<DataLocation>^Warehouse.StockMovementD</DataLocation>
 <DefaultData>StockMovementDefaultData</DefaultData>
-<IdLocation>^Demo.StockMovementD</IdLocation>
-<IndexLocation>^Demo.StockMovementI</IndexLocation>
-<StreamLocation>^Demo.StockMovementS</StreamLocation>
+<IdLocation>^Warehouse.StockMovementD</IdLocation>
+<IndexLocation>^Warehouse.StockMovementI</IndexLocation>
+<StreamLocation>^Warehouse.StockMovementS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

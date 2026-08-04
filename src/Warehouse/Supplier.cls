@@ -1,4 +1,4 @@
-Class Demo.Supplier Extends %Persistent
+Class Warehouse.Supplier Extends %Persistent
 {
 
 Property Name As %String(MAXLEN = 100) [ Required ];
@@ -30,11 +30,11 @@ Storage Default
 <Value>LeadTimeDays</Value>
 </Value>
 </Data>
-<DataLocation>^Demo.SupplierD</DataLocation>
+<DataLocation>^Warehouse.SupplierD</DataLocation>
 <DefaultData>SupplierDefaultData</DefaultData>
-<IdLocation>^Demo.SupplierD</IdLocation>
-<IndexLocation>^Demo.SupplierI</IndexLocation>
-<StreamLocation>^Demo.SupplierS</StreamLocation>
+<IdLocation>^Warehouse.SupplierD</IdLocation>
+<IndexLocation>^Warehouse.SupplierI</IndexLocation>
+<StreamLocation>^Warehouse.SupplierS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

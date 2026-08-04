@@ -5,6 +5,12 @@
     do ##class(Security.Users).UnExpireUserPasswords("*")
     
 
+    set tURL = "https://pm.community.intersystems.com/packages/zpm/latest/installer"
+    set r = ##class(%Net.HttpRequest).%New()
+    set r.Server = "pm.community.intersystems.com"
+    set r.SSLConfiguration = "ISC.FeatureTracker.SSL.Config"
+    do r.Get("/packages/zpm/latest/installer")
+    do $system.OBJ.LoadStream(r.HttpResponse.Data,"c")
 
     // Enable callin for Embedded Python - see merge.cpf
     do ##class(Security.Services).Get("%Service_CallIn",.prop)

@@ -1,7 +1,7 @@
-Class Demo.Utils
+Class Warehouse.Utils
 {
 
-/// Populate all Demo data. Call: do ##class(Demo.Utils).PopulateAll()
+/// Populate all Warehouse data. Call: do ##class(Warehouse.Utils).PopulateAll()
 ClassMethod PopulateAll() As %Status
 {
     do ..CleanAll()
@@ -15,11 +15,11 @@ ClassMethod PopulateAll() As %Status
 
 ClassMethod CleanAll()
 {
-    do ##class(Demo.SupplierProduct).%KillExtent()
-    do ##class(Demo.Supplier).%KillExtent()
-    do ##class(Demo.Transactions).%KillExtent()
-    do ##class(Demo.StockMovement).%KillExtent()
-    do ##class(Demo.Product).%KillExtent()
+    do ##class(Warehouse.SupplierProduct).%KillExtent()
+    do ##class(Warehouse.Supplier).%KillExtent()
+    do ##class(Warehouse.Transactions).%KillExtent()
+    do ##class(Warehouse.StockMovement).%KillExtent()
+    do ##class(Warehouse.Product).%KillExtent()
 }
 
 ClassMethod PopulateProducts() As %Status
@@ -48,7 +48,7 @@ ClassMethod PopulateProducts() As %Status
 
     for i = 1:1:$LISTLENGTH(products) {
         set item = $LIST(products, i)
-        set p = ##class(Demo.Product).%New()
+        set p = ##class(Warehouse.Product).%New()
         set p.SKU        = $LIST(item, 1)
         set p.Name       = $LIST(item, 2)
         set p.Category   = $LIST(item, 3)
@@ -60,7 +60,7 @@ ClassMethod PopulateProducts() As %Status
         quit:$$$ISERR(sc)
 
         // Log initial stock movement
-        set mv = ##class(Demo.StockMovement).%New()
+        set mv = ##class(Warehouse.StockMovement).%New()
         set mv.Product   = p
         set mv.Delta     = p.Quantity
         set mv.Reason    = "Initial stock"
@@ -132,13 +132,13 @@ ClassMethod PopulateTransactions() As %Status
         set qty  = $LIST(item, 3)
         set tot  = $LIST(item, 4)
 
-        set pId = ##class(Demo.Product).SKUIndexOpen(sku)
+        set pId = ##class(Warehouse.Product).SKUIndexOpen(sku)
         if '$ISOBJECT(pId) {
             write "WARNING: SKU "_sku_" not found, skipping",!
             continue
         }
 
-        set t = ##class(Demo.Transactions).%New()
+        set t = ##class(Warehouse.Transactions).%New()
         set t.Product  = pId
         // Convert YYYY-MM-DD to $H date
         set t.Date     = $ZDATEH(dateStr, 3)
@@ -164,7 +164,7 @@ ClassMethod PopulateSuppliers() As %Status
 
     for i = 1:1:$LISTLENGTH(supplierData) {
         set item = $LIST(supplierData, i)
-        set s = ##class(Demo.Supplier).%New()
+        set s = ##class(Warehouse.Supplier).%New()
         set s.Name         = $LIST(item, 1)
         set s.ContactEmail = $LIST(item, 2)
         set s.Phone        = $LIST(item, 3)
@@ -211,19 +211,19 @@ ClassMethod PopulateSuppliers() As %Status
         set orderDate   = $LIST(item, 3)
         set preferred   = $LIST(item, 4)
 
-        set prod = ##class(Demo.Product).SKUIndexOpen(sku)
+        set prod = ##class(Warehouse.Product).SKUIndexOpen(sku)
         if '$ISOBJECT(prod) {
             write "WARNING: SKU "_sku_" not found, skipping",!
             continue
         }
 
-        set sup = ##class(Demo.Supplier).NameIndexOpen(supName)
+        set sup = ##class(Warehouse.Supplier).NameIndexOpen(supName)
         if '$ISOBJECT(sup) {
             write "WARNING: Supplier "_supName_" not found, skipping",!
             continue
         }
 
-        set sp = ##class(Demo.SupplierProduct).%New()
+        set sp = ##class(Warehouse.SupplierProduct).%New()
         set sp.Product       = prod
         set sp.Supplier      = sup
         set sp.LastOrderDate = $ZDATEH(orderDate, 3)

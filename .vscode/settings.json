@@ -21,6 +21,33 @@
     "intersystems.testingManager.client.relativeTestRoot": "tests",
     "chat.tools.terminal.autoApprove": {
       "docker exec": true
-    }
+    },
+    "workbench.colorCustomizations": {
+      "activityBar.activeBackground": "#526600",
+      "activityBar.background": "#526600",
+      "activityBar.foreground": "#e7e7e7",
+      "activityBar.inactiveForeground": "#e7e7e799",
+      "activityBarBadge.background": "#003340",
+      "activityBarBadge.foreground": "#e7e7e7",
+      "activityBarTop.activeBackground": "#526600",
+      "activityBarTop.background": "#526600",
+      "activityBarTop.foreground": "#e7e7e7",
+      "activityBarTop.inactiveForeground": "#e7e7e799",
+      "commandCenter.border": "#e7e7e799",
+      "commandCenter.foreground": "#e7e7e7",
+      "sash.hoverBorder": "#526600",
+      "statusBar.background": "#293300",
+      "statusBar.debuggingBackground": "#293300",
+      "statusBar.debuggingForeground": "#e7e7e7",
+      "statusBar.foreground": "#e7e7e7",
+      "statusBarItem.hoverBackground": "#526600",
+      "statusBarItem.remoteBackground": "#006680",
+      "statusBarItem.remoteForeground": "#e7e7e7",
+      "titleBar.activeBackground": "#293300",
+      "titleBar.activeForeground": "#e7e7e7",
+      "titleBar.inactiveBackground": "#29330099",
+      "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "peacock.color": "#293300"
 
 }

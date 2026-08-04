@@ -1,4 +1,4 @@
-Class Demo.Interop.OrderResponse Extends Ens.Response
+Class Warehouse.Interop.OrderResponse Extends Ens.Response
 {
 
 Property StatusMessage As %String(MAXLEN = 500);

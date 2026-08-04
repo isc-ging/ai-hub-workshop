@@ -1,16 +1,16 @@
-Class Demo.Interop.OrderRouter Extends Ens.BusinessProcess [ ClassType = persistent ]
+Class Warehouse.Interop.OrderRouter Extends Ens.BusinessProcess [ ClassType = persistent ]
 {
 
-Property TargetOperation As %String [ InitialExpression = "Demo.Interop.ToSupplierOperation" ];
+Property TargetOperation As %String [ InitialExpression = "Warehouse.Interop.ToSupplierOperation" ];
 
-Method OnRequest(pRequest As Demo.Interop.OrderRequest, Output pResponse As Ens.Response) As %Status
+Method OnRequest(pRequest As Warehouse.Interop.OrderRequest, Output pResponse As Ens.Response) As %Status
 {
     Set tSC = $$$OK
-    Set pResponse = ##class(Demo.Interop.OrderResponse).%New()
+    Set pResponse = ##class(Warehouse.Interop.OrderResponse).%New()
 
     &sql(SELECT sp.Supplier->ContactEmail, sp.Supplier->LeadTimeDays
          INTO :tEmail, :tLeadTime
-         FROM Demo.SupplierProduct sp
+         FROM Warehouse.SupplierProduct sp
          WHERE sp.Product = :pRequest.ProductId
          ORDER BY sp.IsPreferred DESC
          FETCH 1)
@@ -23,7 +23,7 @@ Method OnRequest(pRequest As Demo.Interop.OrderRequest, Output pResponse As Ens.
     Set tSC = ..SendRequestSync(..TargetOperation, pRequest, .tOpResponse)
     If $$$ISERR(tSC) Quit tSC
 
-    Set tProduct = ##class(Demo.Product).%OpenId(pRequest.ProductId)
+    Set tProduct = ##class(Warehouse.Product).%OpenId(pRequest.ProductId)
     If $IsObject(tProduct) {
         Set tProduct.OnOrder = tProduct.OnOrder + pRequest.Quantity
         Set tSC = tProduct.%Save()
