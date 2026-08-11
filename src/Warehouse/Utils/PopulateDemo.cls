@@ -1,4 +1,4 @@
-Class Warehouse.Utils
+Class Warehouse.Utils.PopulateDemo
 {
 
 /// Populate all Warehouse data. Call: do ##class(Warehouse.Utils).PopulateAll()
@@ -10,6 +10,8 @@ ClassMethod PopulateAll() As %Status
     set sc = ..PopulateTransactions()
     quit:$$$ISERR(sc) sc
     set sc = ..PopulateSuppliers()
+    quit:$$$ISERR(sc) sc
+    set sc = ..PopulateCustomers()
     quit sc
 }
 
@@ -20,6 +22,7 @@ ClassMethod CleanAll()
     do ##class(Warehouse.Transactions).%KillExtent()
     do ##class(Warehouse.StockMovement).%KillExtent()
     do ##class(Warehouse.Product).%KillExtent()
+    do ##class(Warehouse.Customer).%KillExtent()
 }
 
 ClassMethod PopulateProducts() As %Status
@@ -229,6 +232,37 @@ ClassMethod PopulateSuppliers() As %Status
         set sp.LastOrderDate = $ZDATEH(orderDate, 3)
         set sp.IsPreferred   = preferred
         set sc = sp.%Save()
+        quit:$$$ISERR(sc)
+    }
+    quit sc
+}
+
+ClassMethod PopulateCustomers() As %Status
+{
+    set sc = $$$OK
+
+    // columns: Organisation, ContactEmail, Trusted
+    // Trusted = 1 means orders pass through automatically; 0 requires human review
+    set customerData = $LISTBUILD(
+        $LB("Hargreaves & Sons Ltd",        "purchasing@hargreavesandsons.co.uk",  1),
+        $LB("Bentley Home Interiors",       "orders@bentleyhome.co.uk",            1),
+        $LB("The Corner Homeware Co.",      "buying@cornerhomeware.com",           1),
+        $LB("Meridian Retail Group",        "procurement@meridianretail.co.uk",    1),
+        $LB("Foxglove Living",              "trade@foxgloveliving.co.uk",          1),
+        $LB("Aldgate Furnishings",          "orders@aldgatefurnishings.com",       0),
+        $LB("Bloom & Settle",               "enquiries@bloomandsettle.co.uk",      0),
+        $LB("Nova Homewares",               "sales@novahomewares.com",             0),
+        $LB("Thornfield Trading",           "contact@thornfieldtrading.co.uk",     0),
+        $LB("Crestwood Lifestyle Ltd",      "orders@crestwoodlifestyle.com",       0)
+    )
+
+    for i = 1:1:$LISTLENGTH(customerData) {
+        set item = $LIST(customerData, i)
+        set c = ##class(Warehouse.Customer).%New()
+        set c.Organisation  = $LIST(item, 1)
+        set c.ContactEmail  = $LIST(item, 2)
+        set c.Trusted       = $LIST(item, 3)
+        set sc = c.%Save()
         quit:$$$ISERR(sc)
     }
     quit sc

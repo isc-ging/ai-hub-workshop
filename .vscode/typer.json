@@ -51,5 +51,16 @@
     { "line": 23, "breakBefore": 1 }
      
   ]
+}, 
+
+{
+  "input":"../code-demo-scripts/config.toml",
+  "output":"./config.toml",
+  "speed":50,
+  "lines":[
+    {"line":2, "breakBefore":1},
+    {"line":9, "breakBefore":1}
+  ]
+
 }
 ]

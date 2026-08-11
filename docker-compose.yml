@@ -14,3 +14,11 @@ services:
       - 8080:8080
     volumes:
       - ./:/home/irisowner/dev
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+      - "1110:1110"
+    environment:
+      MP_POP3_AUTH: "iris:test123"

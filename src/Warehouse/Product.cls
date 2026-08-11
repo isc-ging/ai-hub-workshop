@@ -7,7 +7,7 @@ Property Name As %String(MAXLEN = 100) [ Required ];
 
 Property Category As %String(MAXLEN = 50);
 
-Property Quantity As %Integer [ InitialExpression = 0 ];
+Property Quantity As %Integer(MINVAL=0) [ InitialExpression = 0];
 
 Property UnitPrice As %Decimal(SCALE = 2);
 
