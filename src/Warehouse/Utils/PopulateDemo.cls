@@ -1,57 +1,48 @@
 Class Warehouse.Utils.PopulateDemo
 {
 
-/// Populate all Warehouse data. Call: do ##class(Warehouse.Utils).PopulateAll()
+/// Populate all Warehouse data. Call: do ##class(Warehouse.Utils.PopulateDemo).PopulateAll()
 ClassMethod PopulateAll() As %Status
 {
     do ..CleanAll()
     set sc = ..PopulateProducts()
     quit:$$$ISERR(sc) sc
-    set sc = ..PopulateTransactions()
-    quit:$$$ISERR(sc) sc
     set sc = ..PopulateSuppliers()
     quit:$$$ISERR(sc) sc
     set sc = ..PopulateCustomers()
+    quit:$$$ISERR(sc) sc
+    set sc = ..PopulateContractPrices()
+    quit:$$$ISERR(sc) sc
+    set sc = ..PopulateOrders()
     quit sc
 }
 
 ClassMethod CleanAll()
 {
-    do ##class(Warehouse.SupplierProduct).%KillExtent()
-    do ##class(Warehouse.Supplier).%KillExtent()
-    do ##class(Warehouse.Transactions).%KillExtent()
-    do ##class(Warehouse.StockMovement).%KillExtent()
-    do ##class(Warehouse.Product).%KillExtent()
-    do ##class(Warehouse.Customer).%KillExtent()
+    do ##class(Warehouse.Data.OrderItem).%KillExtent()
+    do ##class(Warehouse.Data.Order).%KillExtent()
+    do ##class(Warehouse.Data.ContractPrice).%KillExtent()
+    do ##class(Warehouse.Data.SupplierProduct).%KillExtent()
+    do ##class(Warehouse.Data.Supplier).%KillExtent()
+    do ##class(Warehouse.Data.Transactions).%KillExtent()
+    do ##class(Warehouse.Data.StockMovement).%KillExtent()
+    do ##class(Warehouse.Data.Product).%KillExtent()
+    do ##class(Warehouse.Data.Customer).%KillExtent()
 }
 
 ClassMethod PopulateProducts() As %Status
 {
-    // columns: SKU, Name, Category, Quantity, UnitPrice, ReorderLevel, OnOrder
+    // columns: SKU, Name, Category, Quantity, UnitPrice, ReorderLevel, OnOrder, Active
     set products = $LISTBUILD(
-        $LB("HW-001", "Ceramic Dinner Set 12pc",    "Tableware",  45, 89.99,  10, 0),
-        $LB("HW-002", "Stainless Steel Cookware Set","Cookware",   28, 149.99, 15, 0),
-        $LB("HW-003", "Non-stick Frying Pan 28cm",  "Cookware",   62, 34.99,  20, 0),
-        $LB("HW-004", "Bamboo Cutting Board Set",   "Kitchen",    18, 24.99,  15, 0),
-        $LB("HW-005", "Glass Storage Jar Set 6pc",  "Kitchen",    55, 19.99,  20, 0),
-        $LB("HW-006", "Egyptian Cotton Towel Set",  "Bathroom",    8, 44.99,  15, 12),
-        $LB("HW-007", "Microfibre Duvet King",      "Bedding",    31, 79.99,  10, 0),
-        $LB("HW-008", "Memory Foam Pillow Pair",    "Bedding",    24, 39.99,  20, 0),
-        $LB("HW-009", "Scented Candle Collection",  "Decor",      72, 14.99,  25, 0),
-        $LB("HW-010", "Wooden Photo Frame Set 3pc", "Decor",      19, 22.99,  20, 0),
-        $LB("HW-011", "Cast Iron Casserole Dish",   "Cookware",    6, 59.99,  10, 20),
-        $LB("HW-012", "Stoneware Mug Set 4pc",      "Tableware",  41, 29.99,  15, 0),
-        $LB("HW-013", "Linen Table Runner",         "Tableware",  33, 17.99,  20, 0),
-        $LB("HW-014", "Shower Caddy Stainless",     "Bathroom",   14, 27.99,  15, 0),
-        $LB("HW-015", "Bath Mat Anti-slip",         "Bathroom",   47, 12.99,  25, 0),
-        $LB("HW-016", "Kitchen Scale Digital",      "Kitchen",     7, 21.99,  10, 15),
-        $LB("HW-017", "Herb Planter Set Ceramic",   "Decor",      26, 31.99,  15, 0),
-        $LB("HW-018", "Wicker Storage Basket",      "Storage",    38, 18.99,  20, 0)
+        $LB("TS-400", "Industrial temperature sensor",     "Sensors",  120, 80.00,  20, 0,  1),
+        $LB("TS-450", "High-accuracy temperature sensor",  "Sensors",   45, 115.00, 15, 0,  1),
+        $LB("GW-10",  "Sensor gateway",                    "Gateways",  30, 240.00, 10, 5,  1),
+        $LB("CBL-5M", "Five-metre extension cable",        "Cables",   200, 9.50,   40, 0,  1)
     )
 
     for i = 1:1:$LISTLENGTH(products) {
         set item = $LIST(products, i)
-        set p = ##class(Warehouse.Product).%New()
+        set p = ##class(Warehouse.Data.Product).%New()
         set p.SKU        = $LIST(item, 1)
         set p.Name       = $LIST(item, 2)
         set p.Category   = $LIST(item, 3)
@@ -59,95 +50,17 @@ ClassMethod PopulateProducts() As %Status
         set p.UnitPrice  = $LIST(item, 5)
         set p.ReorderLevel = $LIST(item, 6)
         set p.OnOrder    = $LIST(item, 7)
+        set p.Active     = $LIST(item, 8)
         set sc = p.%Save()
         quit:$$$ISERR(sc)
 
         // Log initial stock movement
-        set mv = ##class(Warehouse.StockMovement).%New()
+        set mv = ##class(Warehouse.Data.StockMovement).%New()
         set mv.Product   = p
         set mv.Delta     = p.Quantity
         set mv.Reason    = "Initial stock"
-        set mv.Timestamp = "2025-01-01 00:00:00"
+        set mv.Timestamp = "2026-01-01 00:00:00"
         set sc = mv.%Save()
-        quit:$$$ISERR(sc)
-    }
-    quit sc
-}
-
-ClassMethod PopulateTransactions() As %Status
-{
-    // Generate ~6 months of transactions, Jan-Jun 2025
-    // Spread across products with random daily sales
-    set sc = $$$OK
-
-    set txnData = $LISTBUILD(
-        $LB("HW-001", "2025-01-05",  3, 269.97),
-        $LB("HW-003", "2025-01-07",  5, 174.95),
-        $LB("HW-009", "2025-01-10",  8, 119.92),
-        $LB("HW-012", "2025-01-12",  4, 119.96),
-        $LB("HW-002", "2025-01-15",  2, 299.98),
-        $LB("HW-007", "2025-01-20",  3, 239.97),
-        $LB("HW-005", "2025-01-22",  6,  119.94),
-        $LB("HW-015", "2025-01-28",  7,  90.93),
-        $LB("HW-003", "2025-02-03",  4, 139.96),
-        $LB("HW-008", "2025-02-08",  5, 199.95),
-        $LB("HW-001", "2025-02-10",  2, 179.98),
-        $LB("HW-011", "2025-02-14",  3, 179.97),
-        $LB("HW-013", "2025-02-18",  6, 107.94),
-        $LB("HW-004", "2025-02-22",  4,  99.96),
-        $LB("HW-009", "2025-02-25", 10, 149.90),
-        $LB("HW-006", "2025-03-02",  5, 224.95),
-        $LB("HW-017", "2025-03-05",  4, 127.96),
-        $LB("HW-002", "2025-03-10",  3, 449.97),
-        $LB("HW-012", "2025-03-14",  6, 179.94),
-        $LB("HW-003", "2025-03-18",  8, 279.92),
-        $LB("HW-018", "2025-03-20",  5,  94.95),
-        $LB("HW-010", "2025-03-25",  3,  68.97),
-        $LB("HW-015", "2025-04-01",  9, 116.91),
-        $LB("HW-007", "2025-04-04",  4, 319.96),
-        $LB("HW-005", "2025-04-08",  7, 139.93),
-        $LB("HW-001", "2025-04-12",  3, 269.97),
-        $LB("HW-016", "2025-04-15",  4,  87.96),
-        $LB("HW-009", "2025-04-20", 12, 179.88),
-        $LB("HW-013", "2025-04-24",  5,  89.95),
-        $LB("HW-008", "2025-04-28",  6, 239.94),
-        $LB("HW-002", "2025-05-03",  2, 299.98),
-        $LB("HW-004", "2025-05-07",  5, 124.95),
-        $LB("HW-011", "2025-05-12",  4, 239.96),
-        $LB("HW-017", "2025-05-16",  3,  95.97),
-        $LB("HW-003", "2025-05-20",  6, 209.94),
-        $LB("HW-014", "2025-05-23",  4, 111.96),
-        $LB("HW-012", "2025-05-27",  5, 149.95),
-        $LB("HW-001", "2025-06-02",  4, 359.96),
-        $LB("HW-007", "2025-06-06",  3, 239.97),
-        $LB("HW-009", "2025-06-10", 15, 224.85),
-        $LB("HW-018", "2025-06-14",  6, 113.94),
-        $LB("HW-005", "2025-06-18",  8, 159.92),
-        $LB("HW-016", "2025-06-22",  3,  65.97),
-        $LB("HW-015", "2025-06-25", 10, 129.90),
-        $LB("HW-002", "2025-06-28",  2, 299.98)
-    )
-
-    for i = 1:1:$LISTLENGTH(txnData) {
-        set item = $LIST(txnData, i)
-        set sku  = $LIST(item, 1)
-        set dateStr = $LIST(item, 2)
-        set qty  = $LIST(item, 3)
-        set tot  = $LIST(item, 4)
-
-        set pId = ##class(Warehouse.Product).SKUIndexOpen(sku)
-        if '$ISOBJECT(pId) {
-            write "WARNING: SKU "_sku_" not found, skipping",!
-            continue
-        }
-
-        set t = ##class(Warehouse.Transactions).%New()
-        set t.Product  = pId
-        // Convert YYYY-MM-DD to $H date
-        set t.Date     = $ZDATEH(dateStr, 3)
-        set t.Quantity = qty
-        set t.Total    = tot
-        set sc = t.%Save()
         quit:$$$ISERR(sc)
     }
     quit sc
@@ -157,17 +70,15 @@ ClassMethod PopulateSuppliers() As %Status
 {
     set sc = $$$OK
 
-    // 4 suppliers
     set supplierData = $LISTBUILD(
-        $LB("HomeCraft Wholesale",    "orders@homecraftws.co.uk",  "0161 234 5678", 7),
-        $LB("Nordic Home Supplies",   "trade@nordichome.com",      "0207 890 1234", 14),
-        $LB("Casa Direct Ltd",        "purchasing@casadirect.co.uk","0121 456 7890", 5),
-        $LB("EuroHome Distributors",  "supply@eurohome.eu",        "0131 567 8901", 10)
+        $LB("Sensortech Components",   "orders@sensortech.example",  "0161 234 5678", 7),
+        $LB("Nordic Automation Supply","trade@nordicautomation.eu",  "0207 890 1234", 14),
+        $LB("Cablecraft Ltd",          "sales@cablecraft.example",    "0121 456 7890", 5)
     )
 
     for i = 1:1:$LISTLENGTH(supplierData) {
         set item = $LIST(supplierData, i)
-        set s = ##class(Warehouse.Supplier).%New()
+        set s = ##class(Warehouse.Data.Supplier).%New()
         set s.Name         = $LIST(item, 1)
         set s.ContactEmail = $LIST(item, 2)
         set s.Phone        = $LIST(item, 3)
@@ -179,32 +90,11 @@ ClassMethod PopulateSuppliers() As %Status
 
     // columns: SKU, SupplierName, LastOrderDate (YYYY-MM-DD), IsPreferred
     set spData = $LISTBUILD(
-        $LB("HW-001", "HomeCraft Wholesale",   "2025-05-10", 1),
-        $LB("HW-001", "Casa Direct Ltd",        "2025-02-20", 0),
-        $LB("HW-002", "Nordic Home Supplies",   "2025-06-01", 1),
-        $LB("HW-002", "EuroHome Distributors",  "2025-03-15", 0),
-        $LB("HW-003", "HomeCraft Wholesale",    "2025-06-12", 1),
-        $LB("HW-003", "Casa Direct Ltd",        "2025-04-08", 0),
-        $LB("HW-004", "Casa Direct Ltd",        "2025-05-22", 1),
-        $LB("HW-005", "HomeCraft Wholesale",    "2025-06-18", 1),
-        $LB("HW-005", "Nordic Home Supplies",   "2025-01-30", 0),
-        $LB("HW-006", "EuroHome Distributors",  "2025-04-14", 1),
-        $LB("HW-006", "Nordic Home Supplies",   "2025-06-05", 0),
-        $LB("HW-007", "Nordic Home Supplies",   "2025-05-30", 1),
-        $LB("HW-008", "Nordic Home Supplies",   "2025-04-25", 1),
-        $LB("HW-008", "HomeCraft Wholesale",    "2025-02-11", 0),
-        $LB("HW-009", "Casa Direct Ltd",        "2025-06-20", 1),
-        $LB("HW-010", "HomeCraft Wholesale",    "2025-03-18", 1),
-        $LB("HW-011", "EuroHome Distributors",  "2025-01-15", 1),
-        $LB("HW-011", "Casa Direct Ltd",        "2024-11-20", 0),
-        $LB("HW-012", "HomeCraft Wholesale",    "2025-05-05", 1),
-        $LB("HW-013", "EuroHome Distributors",  "2025-04-02", 1),
-        $LB("HW-014", "Casa Direct Ltd",        "2025-03-28", 1),
-        $LB("HW-015", "HomeCraft Wholesale",    "2025-06-10", 1),
-        $LB("HW-016", "EuroHome Distributors",  "2024-12-05", 1),
-        $LB("HW-016", "Nordic Home Supplies",   "2025-05-14", 0),
-        $LB("HW-017", "Casa Direct Ltd",        "2025-05-19", 1),
-        $LB("HW-018", "HomeCraft Wholesale",    "2025-06-14", 1)
+        $LB("TS-400", "Sensortech Components",    "2026-06-12", 1),
+        $LB("TS-400", "Nordic Automation Supply", "2026-03-02", 0),
+        $LB("TS-450", "Sensortech Components",    "2026-05-20", 1),
+        $LB("GW-10",  "Nordic Automation Supply", "2026-06-01", 1),
+        $LB("CBL-5M", "Cablecraft Ltd",            "2026-06-18", 1)
     )
 
     for i = 1:1:$LISTLENGTH(spData) {
@@ -214,19 +104,19 @@ ClassMethod PopulateSuppliers() As %Status
         set orderDate   = $LIST(item, 3)
         set preferred   = $LIST(item, 4)
 
-        set prod = ##class(Warehouse.Product).SKUIndexOpen(sku)
+        set prod = ##class(Warehouse.Data.Product).SKUIndexOpen(sku)
         if '$ISOBJECT(prod) {
             write "WARNING: SKU "_sku_" not found, skipping",!
             continue
         }
 
-        set sup = ##class(Warehouse.Supplier).NameIndexOpen(supName)
+        set sup = ##class(Warehouse.Data.Supplier).NameIndexOpen(supName)
         if '$ISOBJECT(sup) {
             write "WARNING: Supplier "_supName_" not found, skipping",!
             continue
         }
 
-        set sp = ##class(Warehouse.SupplierProduct).%New()
+        set sp = ##class(Warehouse.Data.SupplierProduct).%New()
         set sp.Product       = prod
         set sp.Supplier      = sup
         set sp.LastOrderDate = $ZDATEH(orderDate, 3)
@@ -241,41 +131,115 @@ ClassMethod PopulateCustomers() As %Status
 {
     set sc = $$$OK
 
-    // columns: Organisation, ContactEmail, Trusted
+    // columns: CustomerId, Organisation, ContactEmail, Status, Trusted, DefaultDeliveryAddress
     // Trusted = 1 means orders pass through automatically; 0 requires human review
     set customerData = $LISTBUILD(
-        $LB("Hargreaves & Sons Ltd",        "purchasing@hargreavesandsons.co.uk",  1),
-        $LB("Bentley Home Interiors",       "orders@bentleyhome.co.uk",            1),
-        $LB("The Corner Homeware Co.",      "buying@cornerhomeware.com",           1),
-        $LB("Meridian Retail Group",        "procurement@meridianretail.co.uk",    1),
-        $LB("Foxglove Living",              "trade@foxgloveliving.co.uk",          1),
-        $LB("Aldgate Furnishings",          "orders@aldgatefurnishings.com",       0),
-        $LB("Bloom & Settle",               "enquiries@bloomandsettle.co.uk",      0),
-        $LB("Nova Homewares",               "sales@novahomewares.com",             0),
-        $LB("Thornfield Trading",           "contact@thornfieldtrading.co.uk",     0),
-        $LB("Crestwood Lifestyle Ltd",      "orders@crestwoodlifestyle.com",       0)
+        $LB("C1001", "Northwind Heating Ltd", "purchasing@northwind.example", "active", 1, "Edinburgh Warehouse"),
+        $LB("C1002", "Alpine Facilities",      "orders@alpine.example",        "active", 1, "Glasgow Depot"),
+        $LB("C1003", "Citywide Engineering",   "buying@citywide.example",      "active", 0, "Manchester Site Office")
     )
 
     for i = 1:1:$LISTLENGTH(customerData) {
         set item = $LIST(customerData, i)
-        set c = ##class(Warehouse.Customer).%New()
-        set c.Organisation  = $LIST(item, 1)
-        set c.ContactEmail  = $LIST(item, 2)
-        set c.Trusted       = $LIST(item, 3)
+        set c = ##class(Warehouse.Data.Customer).%New()
+        set c.CustomerId              = $LIST(item, 1)
+        set c.Organisation            = $LIST(item, 2)
+        set c.ContactEmail            = $LIST(item, 3)
+        set c.Status                  = $LIST(item, 4)
+        set c.Trusted                 = $LIST(item, 5)
+        set c.DefaultDeliveryAddress  = $LIST(item, 6)
         set sc = c.%Save()
         quit:$$$ISERR(sc)
     }
     quit sc
 }
 
-ClassMethod TestService(id, quantity) As %Status
+ClassMethod PopulateContractPrices() As %Status
 {
-    set st =  ##class(Ens.Director).CreateBusinessService("OrderService", .service)
-    set input = {"productId":(id), "quantity":(quantity)}
+    set sc = $$$OK
 
-    set st = service.ProcessInput(input, .output)
-    zw output.StatusMessage
-    return $$$OK
+    // columns: CustomerId, SKU, UnitPrice
+    set priceData = $LISTBUILD(
+        $LB("C1001", "TS-400", 72.00),
+        $LB("C1002", "TS-450", 105.00)
+    )
+
+    for i = 1:1:$LISTLENGTH(priceData) {
+        set item = $LIST(priceData, i)
+        set custId = $LIST(item, 1)
+        set sku    = $LIST(item, 2)
+        set price  = $LIST(item, 3)
+
+        set cust = ##class(Warehouse.Data.Customer).CustomerIdIndexOpen(custId)
+        if '$ISOBJECT(cust) {
+            write "WARNING: Customer "_custId_" not found, skipping",!
+            continue
+        }
+
+        set prod = ##class(Warehouse.Data.Product).SKUIndexOpen(sku)
+        if '$ISOBJECT(prod) {
+            write "WARNING: SKU "_sku_" not found, skipping",!
+            continue
+        }
+
+        set cp = ##class(Warehouse.Data.ContractPrice).%New()
+        set cp.Customer  = cust
+        set cp.Product   = prod
+        set cp.UnitPrice = price
+        set sc = cp.%Save()
+        quit:$$$ISERR(sc)
+    }
+    quit sc
 }
+
+ClassMethod PopulateOrders() As %Status
+{
+    set sc = $$$OK
+
+    // columns: CustomerId, OrderDate, DeliveryAddress, SKU, Quantity, UnitPrice
+    set orderData = $LISTBUILD(
+        $LB("C1001", "2026-07-18", "Edinburgh Warehouse", "TS-400", 20, 72.00),
+        $LB("C1002", "2026-07-02", "Glasgow Depot",       "TS-450", 10, 105.00)
+    )
+
+    for i = 1:1:$LISTLENGTH(orderData) {
+        set item       = $LIST(orderData, i)
+        set custId     = $LIST(item, 1)
+        set orderDate  = $LIST(item, 2)
+        set address    = $LIST(item, 3)
+        set sku        = $LIST(item, 4)
+        set qty        = $LIST(item, 5)
+        set unitPrice  = $LIST(item, 6)
+
+        set cust = ##class(Warehouse.Data.Customer).CustomerIdIndexOpen(custId)
+        if '$ISOBJECT(cust) {
+            write "WARNING: Customer "_custId_" not found, skipping",!
+            continue
+        }
+
+        set prod = ##class(Warehouse.Data.Product).SKUIndexOpen(sku)
+        if '$ISOBJECT(prod) {
+            write "WARNING: SKU "_sku_" not found, skipping",!
+            continue
+        }
+
+        set order = ##class(Warehouse.Data.Order).%New()
+        set order.Customer        = cust
+        set order.OrderDate       = $ZDATEH(orderDate, 3)
+        set order.DeliveryAddress = address
+        set order.Status         = "confirmed"
+
+        set orderItem = ##class(Warehouse.Data.OrderItem).%New()
+        set orderItem.Product   = prod
+        set orderItem.Quantity  = qty
+        set orderItem.UnitPrice = unitPrice
+        do order.Items.Insert(orderItem)
+
+        set sc = order.%Save()
+        quit:$$$ISERR(sc)
+    }
+    quit sc
+}
+
 
 }

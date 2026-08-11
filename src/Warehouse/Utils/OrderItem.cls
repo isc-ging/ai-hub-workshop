@@ -1,4 +1,4 @@
-Class Warehouse.Email.Utils.OrderItem extends %RegisteredObject
+Class Warehouse.Utils.OrderItem extends %RegisteredObject
 {
     Property Id as %String;
 

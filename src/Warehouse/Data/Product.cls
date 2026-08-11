@@ -1,4 +1,4 @@
-Class Warehouse.Product Extends %Persistent
+Class Warehouse.Data.Product Extends %Persistent
 {
 
 Property SKU As %String(MAXLEN = 20) [ Required ];
@@ -6,6 +6,8 @@ Property SKU As %String(MAXLEN = 20) [ Required ];
 Property Name As %String(MAXLEN = 100) [ Required ];
 
 Property Category As %String(MAXLEN = 50);
+
+Property Active As %Boolean [ InitialExpression = 1 ];
 
 Property Quantity As %Integer(MINVAL=0) [ InitialExpression = 0];
 
@@ -44,12 +46,15 @@ Storage Default
 <Value name="8">
 <Value>OnOrder</Value>
 </Value>
+<Value name="9">
+<Value>Active</Value>
+</Value>
 </Data>
-<DataLocation>^Warehouse.ProductD</DataLocation>
+<DataLocation>^Warehouse.Data.ProductD</DataLocation>
 <DefaultData>ProductDefaultData</DefaultData>
-<IdLocation>^Warehouse.ProductD</IdLocation>
-<IndexLocation>^Warehouse.ProductI</IndexLocation>
-<StreamLocation>^Warehouse.ProductS</StreamLocation>
+<IdLocation>^Warehouse.Data.ProductD</IdLocation>
+<IndexLocation>^Warehouse.Data.ProductI</IndexLocation>
+<StreamLocation>^Warehouse.Data.ProductS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

@@ -1,0 +1,19 @@
+slug: ai-hub-workshop
+id: nxyopfz1mf0a
+title: AI Hub Workshop
+description: ""
+icon: ""
+tags: []
+owner: intersystems
+developers:
+- gubsing@hotmail.com
+idle_timeout: 300
+timelimit: 3600
+lab_config:
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  feedback_tab_enabled: false
+  loadingMessages: true
+  hideStopButton: false
+checksum: "6649362195122705631"
+enhanced_loading: false

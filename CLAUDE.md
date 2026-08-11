@@ -50,6 +50,12 @@ mailpit (POP3:1110)
 
 When `ReviewRequired` is true, `ToOrderAgent` should send a `ReviewRequest` (with `AgentNotes` and `ReviewReason` populated) to `ToHumanReview`.
 
+### Data model (`Warehouse.Data.*`)
+
+Persistent classes: `Customer` (CustomerId, ContactEmail, Status, Trusted, DefaultDeliveryAddress), `Product` (SKU, Active, Quantity, UnitPrice), `Order`/`OrderItem` (order history, parent/child), `ContractPrice` (per customer+product negotiated price), `Supplier`/`SupplierProduct`, `StockMovement`, `Transactions`.
+
+Sample data (`Warehouse.Utils.PopulateDemo.PopulateAll()`): sensor products (TS-400, TS-450, GW-10, CBL-5M) and three customers (C1001 Northwind Heating, C1002 Alpine Facilities, C1003 Citywide Engineering) with contract prices and one order-history record each. Sample emails in `Warehouse.Utils.Emails`.
+
 ## Infrastructure
 
 - **IRIS**: port 52773 (web), 1972 (superserver), 8080
@@ -62,4 +68,5 @@ When `ReviewRequired` is true, `ToOrderAgent` should send a `ReviewRequest` (wit
 - `ToOrderAgent` parses the JSON response but does not yet act on it (the `if output.ReviewRequired` block is empty).
 - `ToHumanReview` has an empty MessageMap — stub only.
 - `SupportTarget` routing exists in the Router but no BO has been created for it.
+- `Warehouse.AI.OrderTools.LookUpCustomer` queries a nonexistent `Email` column on `Warehouse.Data.Customer` (should be `ContactEmail`).
 

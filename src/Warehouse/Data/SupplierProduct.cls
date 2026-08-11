@@ -1,9 +1,9 @@
-Class Warehouse.SupplierProduct Extends %Persistent
+Class Warehouse.Data.SupplierProduct Extends %Persistent
 {
 
-Property Supplier As Warehouse.Supplier [ Required ];
+Property Supplier As Warehouse.Data.Supplier [ Required ];
 
-Property Product As Warehouse.Product [ Required ];
+Property Product As Warehouse.Data.Product [ Required ];
 
 Property LastOrderDate As %Date;
 
@@ -32,11 +32,11 @@ Storage Default
 <Value>IsPreferred</Value>
 </Value>
 </Data>
-<DataLocation>^Warehouse.SupplierProductD</DataLocation>
+<DataLocation>^Warehouse.Data.SupplierProductD</DataLocation>
 <DefaultData>SupplierProductDefaultData</DefaultData>
-<IdLocation>^Warehouse.SupplierProductD</IdLocation>
-<IndexLocation>^Warehouse.SupplierProductI</IndexLocation>
-<StreamLocation>^Warehouse.SupplierProductS</StreamLocation>
+<IdLocation>^Warehouse.Data.SupplierProductD</IdLocation>
+<IndexLocation>^Warehouse.Data.SupplierProductI</IndexLocation>
+<StreamLocation>^Warehouse.Data.SupplierProductS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 
