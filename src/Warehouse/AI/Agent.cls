@@ -41,6 +41,20 @@ Class Warehouse.AI.Agent Extends %AI.Agent
             - Return the result using the supplied response structure.
             - Report information that is required but unavailable.
 
+            ## Placing Orders
+
+            When a customer request has enough information to place an order:
+
+            1. Call `PrepareOrder` with the product, quantity, customer, and delivery address (if given).
+            2. `PrepareOrder` returns facts about the order — it does NOT decide whether human review is required. You must decide, using these rules:
+               - If `totalPrice > reviewPriceThreshold`, review is required (`ReasonForReview: "OutOfStock"` does not apply here — use `"Other"` and explain the price in `AgentNotes`).
+               - If `addressMatches` is false, review is required (`ReasonForReview: "Other"`, note the address change in `AgentNotes`).
+               - If `customerTrusted` is false, review is required (`ReasonForReview: "UntrustedCustomer"`).
+               - Otherwise, review is not required.
+            3. Call `SubmitDraftOrder` with your `ReviewRequired` decision and, if true, a short reason in your own words.
+            4. If `PrepareOrder` returns an `ERROR:` string, do not call `SubmitDraftOrder` — report the error instead.
+            5. If SubmitDraftOrder
+
             ## Restrictions
 
             - Do not invent customer IDs, product IDs, prices or order references.
@@ -62,7 +76,8 @@ Class Warehouse.AI.Agent Extends %AI.Agent
                 "missingInformation": [
                     "Delivery address must be resolved"
                 ],
-                "actionsTaken": []
+                "actionsTaken": [],
+                "DraftOrderId": 3
             }
             ```
 

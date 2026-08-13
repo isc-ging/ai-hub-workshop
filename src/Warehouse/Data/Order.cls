@@ -3,7 +3,7 @@ Class Warehouse.Data.Order Extends %Persistent
 
 Property Customer As Warehouse.Data.Customer [ Required ];
 
-Property OrderDate As %Date [ Required ];
+Property OrderDate As %TimeStamp [ Required ];
 
 Property DeliveryAddress As %String(MAXLEN = 200) [ Required ];
 
@@ -16,9 +16,15 @@ Index CustomerIndex On Customer;
 Index OrderDateIndex On OrderDate;
 
 
-Method %OnSave()
+Method %OnAddToSaveSet(
+    depth As %Integer,
+    insert As %Integer,
+    callcount As %Integer) As %Status
 {
-    set OrderDate = $HOROLOG
+    If insert {
+        Set ..OrderDate = $ZDT($H,3)
+    }
+    Quit $$$OK
 
 }
 
