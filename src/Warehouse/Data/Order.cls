@@ -7,13 +7,22 @@ Property OrderDate As %Date [ Required ];
 
 Property DeliveryAddress As %String(MAXLEN = 200) [ Required ];
 
-Property Status As %String(VALUELIST = ",draft,confirmed") [ InitialExpression = "confirmed" ];
+Property Product As Warehouse.Data.Product [ Required ];
 
-Relationship Items As Warehouse.Data.OrderItem [ Cardinality = children, Inverse = Order ];
+Property Quantity As %Integer [ Required ];
 
 Index CustomerIndex On Customer;
 
 Index OrderDateIndex On OrderDate;
+
+
+Method %OnSave()
+{
+    set OrderDate = $HOROLOG
+
+}
+
+
 
 Storage Default
 {
@@ -31,7 +40,10 @@ Storage Default
 <Value>DeliveryAddress</Value>
 </Value>
 <Value name="5">
-<Value>Status</Value>
+<Value>Product</Value>
+</Value>
+<Value name="6">
+<Value>Quantity</Value>
 </Value>
 </Data>
 <DataLocation>^Warehouse.Data.OrderD</DataLocation>

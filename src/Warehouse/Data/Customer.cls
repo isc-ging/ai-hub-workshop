@@ -15,7 +15,7 @@ Property DefaultDeliveryAddress As %String(MAXLEN = 200);
 
 Index OrganisationIndex On Organisation [ Unique ];
 
-Index CustomerIdIndex On CustomerId [ Unique ];
+Index KEY On CustomerId [ IdKey ];
 
 Index ContactEmailIndex On ContactEmail [ Unique ];
 

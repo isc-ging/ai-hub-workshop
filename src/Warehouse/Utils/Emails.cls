@@ -6,7 +6,7 @@ Class Warehouse.Utils.Emails Extends %RegisteredObject
         {
             "From": "purchasing@northwind.example",
             "Subject": "Temperature sensors",
-            "Body": "Hi,\n\nCould you arrange an order for 20 of the TS-400 temperature sensors?\n\nPlease send them to our usual warehouse.\n\nThanks,\nSarah"
+            "Body": "Hi,\n\nCould you arrange an order for 20 of the TS-400 temperature sensors?\n\nPlease send them to the standard address.\n\nThanks,\nSarah"
         }
     }
 

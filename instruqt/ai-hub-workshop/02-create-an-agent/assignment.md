@@ -8,13 +8,13 @@ enhanced_loading: null
 ---
 
 
-Let's start by creating our basic agent. Open the [VS Code](tab-0) tab, then open the file `src/Warehouse/Agent.cls`
+Let's start by creating our basic agent. Open the [VS Code](tab-0) tab, then open the file `src/Warehouse/AI/Agent.cls`
 
 To create an AI agent using AI Hub, the class needs to do the following:
     - Use `%AI.Agent` as a superclass
     - Define a model/provider configuration for the LLM.
 
-This file has done these steps for us. The model is given with the `MODEL` parameter, while the provider is set with a custom `%OnInit` method. Here, the credentials are accessed from the config store, a feature being released with the AI Hub.
+This file has done these steps for us. The model config is named with the `MODELCONFIG` parameter, while the provider is set with a custom `%OnInit` method. Here, the credentials are accessed from the config store, a feature being released with the AI Hub.
 
 
 ## Trying out the agent
@@ -32,7 +32,7 @@ To test the agent, open the [Shell](tab-1) tab and do the following:
 
 ```objectscript
 // Instantiate
-set agent = ##class(Warehouse.Agent).%New()
+set agent = ##class(Warehouse.AI.Agent).%New()
 
 // Initialise
 set sc = agent.%Init()
@@ -127,7 +127,7 @@ Try, using the syntax given above, prompt the agent with the email above:
 ```objectscript
 set email = ##class(Warehouse.Utils.Emails).ReturnEmailString(1)
 
-set agent = ##class(Warehouse.Agent).%New()
+set agent = ##class(Warehouse.AI.Agent).%New()
 set sc = agent.%Init()
 set session = agent.CreateSession()
 set response = agent.Chat(session, email)
@@ -137,10 +137,10 @@ write response.Content
 
 </details>
 
-Despite our best efforts with the system prompt, sometimes the agent returns text either side of the JSON output. We could upgrade the model to a better (more expensive) model, but this can also be handled with a utility method:
+Despite our best efforts with the system prompt, sometimes the agent returns text either side of the JSON output. We could upgrade the model to a better (more expensive) model, but this can also be handled with a utility method (feel free to take a look at the contents):
 
 ```
-set obj = ##class(Warehouse.Utils).ExtractJSON(response.Content)
+set obj = ##class(Warehouse.Utils.JSON).ExtractJSON(response.Content)
 ```
 
 So now try:
@@ -150,8 +150,6 @@ zwrite obj
 ```
 
 You should have a structured response!
-
-
 
 
 The agent can be further customised with tools, skills and knowledge bases. The next step will show how to create and add tools to the agent.

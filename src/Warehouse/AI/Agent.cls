@@ -2,16 +2,31 @@ Class Warehouse.AI.Agent Extends %AI.Agent
 {
 
     /// LLM Model
-    Parameter MODEL = "us.anthropic.claude-haiku-4-5-20251001-v1:0";
+    Parameter MODELCONFIG = "bedrock.claude-haiku-4-5";
+
+    Parameter TOOLSETS = "Warehouse.AI.ToolSet";
 
     /// Initialization method. Can be used to set provider, or add stateful tools and policies. 
     /// Called by `.%Init()`
     Method %OnInit() As %Status{
-        set key = $SYSTEM.Util.GetEnviron("AWS_BEARER_TOKEN_BEDROCK")
-        set ..Provider = ##class(%AI.Provider).Create("bedrock", {"bearer_token":(key), "region":"us-east-1"  })
+        
+        set sc = $$$OK
+        w "Initialising"
+        try {
+        
+        set sc = ##class(%ConfigStore.Configuration).GetDetails("AI.LLM."_..#MODELCONFIG, .details, 0, 1)
+        quit:$$$ISERR(sc) 
 
-        Return $$$OK
+        set ..Provider = ##class(%AI.Provider).Create(details."model_provider", details)
+
+        set ..Model = details.model
+
+        } catch (ex) {
+        set sc = ex.AsStatus()
     }
+    quit sc
+    }
+    
 
 
     XData INSTRUCTIONS [MimeType="text/markdown"] { 
@@ -51,34 +66,28 @@ Class Warehouse.AI.Agent Extends %AI.Agent
             }
             ```
 
-            Your response must begin with { and end with }, and only include correctly formatted JSON data. Do not include code fences or any other text outside of the JSON. 
+            Your response must begin with { and end with }, and only include correctly formatted JSON data. DO NOT WRAP YOUR RESPONSE IN CODE FENCES.
 
     }
 
-
-    /// %AI.Agent does not enforce any response schema, so instructing a model to
-    /// "respond with raw JSON only" is not reliable - it may still wrap the object
-    /// in markdown code fences or add leading/trailing commentary. Strip that noise
-    /// down to the outermost {...} span before handing the result to %FromJSON.
-    ClassMethod ExtractJSON(pContent As %String) As %String
+    ClassMethod ProcessEmail(pEmail as %String) As %DynamicObject
     {
-        set start = $Find(pContent, "{") - 1
-        if start = -1 {
-            return pContent
-        }
+    // Create an initialise agent
+    set agent = ##class(Warehouse.AI.Agent).%New()
+    set sc = agent.%Init()
 
-        set finish = 0
-        set pos = $Find(pContent, "}")
-        while pos > 0 {
-            set finish = pos - 1
-            set pos = $Find(pContent, "}", pos)
-        }
+    if $$$ISERR(sc){ quit sc} // Error handling
 
-        if (finish = 0) || (finish < start) {
-            return pContent
-        }
+    set session = agent.CreateSession()
 
-        return $Extract(pContent, start, finish)
-    }
+    set response = agent.Chat(session, pEmail)
+
+    do session.%Save() // Save session to DB (Can access later)
+
+    set responseObj = ##class(Warehouse.Utils.JSON).ExtractJSON(response.Content)
+
+    return responseObj
+
+}
 
 }

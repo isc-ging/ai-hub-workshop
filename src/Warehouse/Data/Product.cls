@@ -17,7 +17,7 @@ Property ReorderLevel As %Integer [ InitialExpression = 10 ];
 
 Property OnOrder As %Integer [ InitialExpression = 0 ];
 
-Index SKUIndex On SKU [ Unique ];
+Index KEY On SKU [ IdKey ];
 
 Storage Default
 {

@@ -71,8 +71,8 @@ Class Warehouse.AI.LookupTools Extends %AI.Tool
     Query GetOrders(pCustomerId As %String ="", pCustomerEmail As %String = "") As %SQLQuery [SqlProc]{
 
         SELECT
-        ID, DeliveryAddress, OrderDate, Status
-        FROM Warehouse_Data.Order WHERE Customer=:pCustomerId OR Customer->ContactEmail=:pEmail
+        ID, DeliveryAddress, OrderDate
+        FROM Warehouse_Data.Order WHERE Customer=:pCustomerId OR Customer->ContactEmail=:pCustomerEmail
     }
 
 }
@@ -94,10 +94,10 @@ Add the Audit policy to the policies block and our Lookup tools class as an incl
 
 ```xml
 <!-- Add to the Policies block-->
-<Audit Class="Warehouse.AI.ConsoleAudit">
+<Audit Class="Warehouse.AI.ConsoleAudit"/>
 
 <!-- Add Directly to the <ToolSet> block-->
-<Include Class="Warehouse.AI.Tools">
+<Include Class="Warehouse.AI.LookupTools"/>
 ```
 
 When you have done this, save the file.
@@ -111,13 +111,13 @@ Return to our `src/Warehouse/AI/Agent.cls` file. From here, we can add tools a c
 Parameter TOOLSETS = "Warehouse.AI.ToolSet";
 ```
 
-While you are here, add the following function to make testing the agent easier:
+While you are here, add the following function to make using the agent easier:
 
 ```objectscript
 ClassMethod ProcessEmail(pEmail as %String) As %DynamicObject
 {
     // Create an initialise agent
-    set agent = ##class(Warehouse.AI.Agent)
+    set agent = ##class(Warehouse.AI.Agent).%New()
     set sc = agent.%Init()
 
     if $$$ISERR(sc){ quit sc} // Error handling
@@ -139,7 +139,7 @@ Ensure you save the file to trigger auto-compiling.
 
 ## Try the agent again
 
-Test the agent (via the process email function defined above) with the second email. To print the email use: `do ##class(Warehouse.Utils.Email).PrintEmail(2)`, and to get the full version use `##class(Warehouse.Utils.Email).ReturnEmailString(2)`.
+Test the agent (via the process email function defined above) with the second email. To print the email use: `do ##class(Warehouse.Utils.Emails).PrintEmail(2)`, and to get the full version use `##class(Warehouse.Utils.Emails).ReturnEmailString(2)`.
 
 Take a look at the responseObj with `zwrite`. You should see a structured description fo the email.
 

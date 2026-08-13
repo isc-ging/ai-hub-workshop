@@ -1,13 +1,15 @@
-Class Warehouse.AI.ToolSet Extends %RegisteredObject
+Class Warehouse.AI.ToolSet Extends %AI.ToolSet
 {
-    XData DEFINITION {
+    XData Definition [MimeType = "application/xml"] 
+    {
         <ToolSet>
-            <Description>Sample Toolset</Description>
+            <Description>asdf </Description>
             <Policies>
                 <Audit Class="Warehouse.AI.ConsoleAudit"/>
             </Policies>
         
-            <Include Class="Warehouse.AI.LookupTools.cls"/>
+            <Include Class="Warehouse.AI.LookupTools"/>
+            <Include Class="Warehouse.AI.OrderTools"/>
         </ToolSet>
     }
 }
