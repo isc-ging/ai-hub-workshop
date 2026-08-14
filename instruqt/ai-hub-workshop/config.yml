@@ -3,3 +3,5 @@ virtualmachines:
 - name: ai-hub-eap
   image: intersystems/ai-hub-eap
   machine_type: n1-standard-1
+secrets:
+- name: AWS_BEARER_TOKEN_BEDROCK

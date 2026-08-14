@@ -1,0 +1,168 @@
+#!/bin/bash
+
+exec > /tmp/track-startup.log 2>&1
+set -euo pipefail
+
+# Wait for Instruqt host bootstrap to finish
+until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ]; do
+  sleep 1
+done
+
+
+iris start iris
+
+
+su - irisowner <<'EOSU'
+
+mkdir -p /home/irisowner/.config/code-server/
+
+
+# Set code server config
+cat << 'EOF' > /home/irisowner/.config/code-server/config.yaml
+bind-addr: 0.0.0.0:8888
+auth: none
+password: sys
+cert: false
+EOF
+
+# install ISC extensions 
+code-server --install-extension intersystems-community.objectscript-pack
+
+# Start up code server
+nohup code-server > /tmp/code-server.log 2>&1 &
+
+
+mkdir -p ~/.local/share/code-server/User/
+
+
+cat > /home/irisowner/.local/share/code-server/User/settings.json << 'EOF'
+{
+  "terminal.integrated.defaultProfile.linux": "bash",
+    "objectscript.conn": {
+        "host": "localhost",
+        "port": 52773,
+        "username": "_SYSTEM",
+        "password":"SYS",
+        "ns": "USER",
+        "active": true
+    },
+    "intersystems.servers": {
+        "52773": {
+            "webServer": {
+                "scheme": "http",
+                "host": "localhost",
+                "port": 52773
+            },
+            "username": "_SYSTEM",
+            "password":"SYS"
+        }
+    },
+  "sqltools.autoConnectTo": ["IRIS"],
+  "sqltools.autoOpenSessionFiles": true,
+  "sqltools.connections": [
+    {
+      "namespace": "USER",
+      "connectionMethod": "Server and Port",
+      "showSystem": false,
+      "previewLimit": 50,
+      "server": "iris",
+      "port": 52773,
+      "askForPassword": false,
+      "driver": "InterSystems IRIS",
+      "name": "IRIS",
+      "username": "_SYSTEM",
+      "password": "SYS"
+    }
+  ],
+  "sqltools.useNodeRuntime": true,
+  "git.openRepositoryInParentFolders": "never",
+  	"chat.disableAIFeatures": true,
+	"chat.agent.enabled": false,
+	"security.workspace.trust.enabled": false,
+	"workbench.welcomePage.experimentalOnboarding": false,
+    "workbench.startupEditor": "none",
+	 "workbench.secondarySideBar.defaultVisibility": "hidden",
+	 "window.restoreWindows": "none",
+       "workbench.colorTheme": "InterSystems Default Dark"
+}
+EOF
+
+
+REPO_DIR=/home/irisowner/ai-hub-workshop
+
+rm -rf "${REPO_DIR}"
+git clone https://github.com/isc-ging/ai-hub-workshop.git "${REPO_DIR}"
+
+AI_DIR="${REPO_DIR}/src/EmailAI"
+
+# Remove the finished agent/tooling classes - learners build these back up
+# through the workshop challenges.
+rm -f "${AI_DIR}/Agent.cls"
+rm -f "${AI_DIR}/LookUpTools.cls"
+rm -f "${AI_DIR}/OrderTools.cls"
+rm -f "${AI_DIR}/ToolSet.cls"
+rm -f "${AI_DIR}/ConsoleAudit.cls"
+
+# Starting-point Agent.cls: model/provider config only, no system prompt
+# and no ProcessEmail helper - those are added in later challenges.
+cat > "${AI_DIR}/Agent.cls" <<'EOF'
+Class EmailAI.Agent Extends %AI.Agent
+{
+
+    /// LLM Model
+    Parameter MODELCONFIG = "bedrock.claude-haiku-4-5";
+
+    /// Initialization method. Can be used to set provider, or add stateful tools and policies.
+    /// Called by `.%Init()`
+    Method %OnInit() As %Status{
+
+        set sc = $$$OK
+        w "Initialising"
+        try {
+
+        set sc = ##class(%ConfigStore.Configuration).GetDetails("AI.LLM."_..#MODELCONFIG, .details, 0, 1)
+        quit:$$$ISERR(sc)
+
+        set ..Provider = ##class(%AI.Provider).Create(details."model_provider", details)
+
+        set ..Model = details.model
+
+        } catch (ex) {
+        set sc = ex.AsStatus()
+    }
+    quit sc
+    }
+
+}
+EOF
+
+rm -rf "${REPO_DIR}/.vscode"
+mkdir -p "${REPO_DIR}/.vscode"
+cat > "${REPO_DIR}/.vscode/settings.json" <<'EOF'
+{
+    "objectscript.conn": {
+        "host": "localhost",
+        "port": 52773,
+        "username": "_SYSTEM",
+        "password": "SYS",
+        "ns": "USER",
+        "active": true
+    }
+}
+EOF
+
+EOSU
+
+# Second su block uses unquoted heredoc so ${AWS_BEARER_TOKEN_BEDROCK} expands in the outer shell
+su - irisowner <<EOSU2
+
+iris session iris -UUSER <<EOF
+
+do ##class(%SYSTEM.OBJ).Import("/home/irisowner/ai-hub-workshop/src", "cuk")
+
+do ##class(Utils.ConfigStore).SaveResources("${AWS_BEARER_TOKEN_BEDROCK}")
+
+EOF
+
+EOSU2
+

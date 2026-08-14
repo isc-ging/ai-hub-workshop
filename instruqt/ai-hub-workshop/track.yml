@@ -14,6 +14,7 @@ lab_config:
   feedback_recap_enabled: true
   feedback_tab_enabled: false
   loadingMessages: true
+  override_challenge_layout: false
   hideStopButton: false
-checksum: "6649362195122705631"
+checksum: "3030235586667680260"
 enhanced_loading: false
