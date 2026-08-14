@@ -1,6 +1,6 @@
 Class Utils.ConfigStore
 {
-ClassMethod CreateSecretResources()
+ClassMethod CreateSecretResources(pKey as %String)
 {
     New $NAMESPACE
     Set $NAMESPACE="%SYS"
@@ -10,21 +10,20 @@ ClassMethod CreateSecretResources()
     Do ##class(%Wallet.Collection).Delete("MyCollection")
     Do ##class(%Wallet.Collection).Create("MyCollection", {"UseResource" : "ConfigStoreUse", "EditResource" : "ConfigStoreEdit"})
 
-    set key = $SYSTEM.Util.GetEnviron("AWS_BEARER_TOKEN_BEDROCK")
 
     set secret1 = {
         "Usage": "CUSTOM",
         "Secret": {
-            "key": (key)
+            "key": (pKey)
         }
     }
     
     $$$QuitOnError(##class(%Wallet.KeyValue).Create("MyCollection.BedrockKey", secret1))
 }
 
-ClassMethod SaveResources() As %Status
+ClassMethod SaveResources(pKey As %String) As %Status
 {
-    Do ..CreateSecretResources()
+    Do ..CreateSecretResources(pKey)
     w "Secret resources created.", !
 
     Do ##class(%ConfigStore.Configuration).Delete("AI.LLM.Haiku")
