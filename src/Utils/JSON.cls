@@ -1,6 +1,6 @@
-Class Warehouse.Utils.JSON Extends %RegisteredObject
+Class Utils.JSON Extends %RegisteredObject
 {
-        /// %AI.Agent does not enforce any response schema, so instructing a model to
+    /// %AI.Agent does not enforce any response schema, so instructing a model to
     /// "respond with raw JSON only" is not reliable - it may still wrap the object
     /// in markdown code fences or add leading/trailing commentary. Strip that noise
     /// down to the outermost {...} span before handing the result to %FromJSON.

@@ -1,4 +1,4 @@
-Class Warehouse.AI.ConsoleAudit Extends %AI.Policy.Audit
+Class EmailAI.ConsoleAudit Extends %AI.Policy.Audit
 {
 /// Log execution to console
 Method %LogExecution(call As %DynamicObject, metadata As %DynamicObject, result As %DynamicObject, duration As %Integer, status As %Status) As %Status
@@ -28,4 +28,3 @@ Method %LogExecution(call As %DynamicObject, metadata As %DynamicObject, result 
 }
 
 }
-

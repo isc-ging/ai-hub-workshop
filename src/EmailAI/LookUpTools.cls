@@ -1,29 +1,29 @@
-Class Warehouse.AI.LookupTools Extends %AI.Tool
+Class EmailAI.LookUpTools Extends %AI.Tool
 {
 
 /// Look up customer ID based on their email
 Query LookUpCustomer(pEmail As %String) As %SQLQuery [ SqlProc ]
 {
-    SELECT 
+    SELECT
     ID, CustomerId, DefaultDeliveryAddress, Organisation, Status, Trusted
-    FROM Warehouse_Data.Customer WHERE ContactEmail = :pEmail
+    FROM Warehouse.Customer WHERE ContactEmail = :pEmail
 }
 
 /// Retrieve a list of products
 Query GetProducts() As %SQLQuery [SqlProc]{
-    SELECT 
+    SELECT
     ID, Active, Category, Name, OnOrder, Quantity, ReorderLevel, SKU, UnitPrice
-    FROM Warehouse_Data.Product
+    FROM Warehouse.Product
 }
 
 
 /// Get orders based on Customer ID or Email
 Query GetOrders(pCustomerId As %String ="", pCustomerEmail As %String = "") As %SQLQuery [SqlProc]{
-    
-    SELECT 
+
+    SELECT
     ID, DeliveryAddress, OrderDate
-    FROM Warehouse_Data.Order WHERE Customer=:pCustomerId OR Customer->ContactEmail=:pCustomerEmail
-} 
+    FROM Warehouse.Order WHERE Customer=:pCustomerId OR Customer->ContactEmail=:pCustomerEmail
+}
 
 
 }

@@ -1,13 +1,13 @@
-Class Warehouse.Data.Order Extends %Persistent
+Class Warehouse.Order Extends %Persistent
 {
 
-Property Customer As Warehouse.Data.Customer [ Required ];
+Property Customer As Warehouse.Customer [ Required ];
 
 Property OrderDate As %TimeStamp [ Required ];
 
 Property DeliveryAddress As %String(MAXLEN = 200) [ Required ];
 
-Property Product As Warehouse.Data.Product [ Required ];
+Property Product As Warehouse.Product [ Required ];
 
 Property Quantity As %Integer [ Required ];
 
@@ -52,11 +52,11 @@ Storage Default
 <Value>Quantity</Value>
 </Value>
 </Data>
-<DataLocation>^Warehouse.Data.OrderD</DataLocation>
+<DataLocation>^Warehouse.OrderD</DataLocation>
 <DefaultData>OrderDefaultData</DefaultData>
-<IdLocation>^Warehouse.Data.OrderD</IdLocation>
-<IndexLocation>^Warehouse.Data.OrderI</IndexLocation>
-<StreamLocation>^Warehouse.Data.OrderS</StreamLocation>
+<IdLocation>^Warehouse.OrderD</IdLocation>
+<IndexLocation>^Warehouse.OrderI</IndexLocation>
+<StreamLocation>^Warehouse.OrderS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

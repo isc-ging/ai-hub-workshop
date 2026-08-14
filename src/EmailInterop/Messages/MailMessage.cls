@@ -1,4 +1,4 @@
-Class Warehouse.Interop.Messages.MailMessage Extends (Ens.MessageBody, %JSON.Adaptor)
+Class EmailInterop.Messages.MailMessage Extends (Ens.MessageBody, %JSON.Adaptor)
 {
 
 Property Subject As %String(MAXLEN = 1000);
@@ -22,9 +22,9 @@ Property HTMLData As %Stream.GlobalCharacter;
 Property Category As %String(VALUELIST=",Order,Support,Other") [InitialExpression=""];
 
 /// Populate this message from a raw %Net.MailMessage received by the inbound adapter.
-ClassMethod FromNetMail(pMail As %Net.MailMessage, Output pMsg As Warehouse.Interop.Messages.MailMessage) As %Status
+ClassMethod FromNetMail(pMail As %Net.MailMessage, Output pMsg As EmailInterop.Messages.MailMessage) As %Status
 {
-    Set pMsg = ##class(Warehouse.Interop.Messages.MailMessage).%New()
+    Set pMsg = ##class(EmailInterop.Messages.MailMessage).%New()
     Set pMsg.Subject  = pMail.Subject
     Set pMsg.MailFrom = pMail.From
     Set pMsg.ReplyTo  = pMail.ReplyTo

@@ -1,4 +1,4 @@
-Class Warehouse.Data.Customer Extends %Persistent
+Class Warehouse.Customer Extends %Persistent
 {
 
 Property CustomerId As %String(MAXLEN = 20) [ Required ];
@@ -44,11 +44,11 @@ Storage Default
 <Value>DefaultDeliveryAddress</Value>
 </Value>
 </Data>
-<DataLocation>^Warehouse.Data.CustomerD</DataLocation>
+<DataLocation>^Warehouse.CustomerD</DataLocation>
 <DefaultData>CustomerDefaultData</DefaultData>
-<IdLocation>^Warehouse.Data.CustomerD</IdLocation>
-<IndexLocation>^Warehouse.Data.CustomerI</IndexLocation>
-<StreamLocation>^Warehouse.Data.CustomerS</StreamLocation>
+<IdLocation>^Warehouse.CustomerD</IdLocation>
+<IndexLocation>^Warehouse.CustomerI</IndexLocation>
+<StreamLocation>^Warehouse.CustomerS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

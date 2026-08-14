@@ -1,8 +1,8 @@
-Class Warehouse.Interop.Messages.ReviewRequest Extends Warehouse.Interop.Messages.MailMessage
+Class EmailInterop.Messages.ReviewRequest Extends EmailInterop.Messages.MailMessage
 {
     Property AgentNotes As %VarString;
 
-    Property ReviewReason As %VarString; 
+    Property ReviewReason As %VarString;
 
     Property Intent As %VarString;
 

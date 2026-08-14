@@ -1,7 +1,7 @@
-Class Warehouse.AI.OrderTools Extends %AI.Tool
+Class EmailAI.OrderTools Extends %AI.Tool
 {
 
-Property DraftOrder As Warehouse.Data.DraftOrder;
+Property DraftOrder As Warehouse.DraftOrder;
 
 /// Threshold price above which an order requires human review
 Parameter REVIEWPRICETHRESHOLD = 2000;
@@ -13,10 +13,10 @@ Parameter REVIEWPRICETHRESHOLD = 2000;
 /// Insufficient stock is a hard stop: no draft is built and an ERROR is returned.
 Method PrepareOrder(pProductId As %String, pQuantity As %Integer, pCustomerId As %String, pDeliveryAddress As %String = "") As %String
 {
-    set product = ##class(Warehouse.Data.Product).%OpenId(pProductId)
+    set product = ##class(Warehouse.Product).%OpenId(pProductId)
     if '$IsObject(product) quit "ERROR: Product ID not recognised"
 
-    set customer = ##class(Warehouse.Data.Customer).%OpenId(pCustomerId)
+    set customer = ##class(Warehouse.Customer).%OpenId(pCustomerId)
     if '$IsObject(customer) quit "ERROR: Customer ID not recognised"
 
     if pQuantity > product.Quantity {
@@ -28,7 +28,7 @@ Method PrepareOrder(pProductId As %String, pQuantity As %Integer, pCustomerId As
         set resolvedAddress = customer.DefaultDeliveryAddress
     }
 
-    set ..DraftOrder = ##class(Warehouse.Data.DraftOrder).%New()
+    set ..DraftOrder = ##class(Warehouse.DraftOrder).%New()
     set ..DraftOrder.Product = product
     set ..DraftOrder.Quantity = pQuantity
     set ..DraftOrder.Customer = customer

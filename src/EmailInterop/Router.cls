@@ -1,7 +1,7 @@
-Class Warehouse.Interop.Router extends Ens.BusinessProcess
+Class EmailInterop.Router extends Ens.BusinessProcess
 {
     Property EmailParserTarget As Ens.DataType.ConfigName;
- 
+
     Property OrderTarget As Ens.DataType.ConfigName;
 
     Property SupportTarget As Ens.DataType.ConfigName;
@@ -9,12 +9,12 @@ Class Warehouse.Interop.Router extends Ens.BusinessProcess
     Property HumanTarget As Ens.DataType.ConfigName;
 
     Parameter SETTINGS = "EmailParserTarget:Basic,OrderTarget:Basic,SupportTarget:Basic,HumanTarget:Basic";
-    
-    Method OnRequest(pInput As Warehouse.Interop.Messages.MailMessage) As %Status{
+
+    Method OnRequest(pInput As EmailInterop.Messages.MailMessage) As %Status{
 
         set status = ..SendRequestSync(..EmailParserTarget,pInput, .pOutput )
 
-        
+
         Set target = $CASE(pOutput.Category,
             "Order":   ..OrderTarget,
             "Support": ..SupportTarget,

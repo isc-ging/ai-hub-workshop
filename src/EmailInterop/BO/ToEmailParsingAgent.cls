@@ -1,9 +1,9 @@
-Class Warehouse.Interop.BO.ToEmailParsingAgent extends Ens.BusinessOperation
+Class EmailInterop.BO.ToEmailParsingAgent extends Ens.BusinessOperation
 {
 
     XData MessageMap{
     <MapItems>
-        <MapItem MessageType="Warehouse.Interop.Messages.MailMessage">
+        <MapItem MessageType="EmailInterop.Messages.MailMessage">
             <Method>CategoriseEmail</Method>
         </MapItem>
     </MapItems>
@@ -11,23 +11,23 @@ Class Warehouse.Interop.BO.ToEmailParsingAgent extends Ens.BusinessOperation
 
 
 
-    Method CategoriseEmail(pInput As Warehouse.Interop.Messages.MailMessage, 
-                    output pOutput As Warehouse.Interop.Messages.MailMessage) As %Status
+    Method CategoriseEmail(pInput As EmailInterop.Messages.MailMessage,
+                    output pOutput As EmailInterop.Messages.MailMessage) As %Status
     {
 
-        set agent = ##class(Warehouse.AI.Agents.EmailParser).%New()
-        set status = agent.%Init() 
+        set agent = ##class(EmailAI.Agent).%New()
+        set status = agent.%Init()
         if $$$ISERR(status){
             return status
         }
 
         set st = pInput.%JSONExportToString(.prompt)
 
-        set session  = agent.CreateSession() 
+        set session  = agent.CreateSession()
 
         set response = agent.Chat(session, prompt)
         d session.%Save()
-        set json = ##class(Warehouse.AI.BaseAgent).ExtractJSON(response.Content)
+        set json = ##class(Utils.JSON).ExtractJSON(response.Content)
 
         try {
             set output = {}.%FromJSON(json)

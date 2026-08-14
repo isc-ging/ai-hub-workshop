@@ -1,4 +1,4 @@
-Class Warehouse.Interop.BO.ToOrderAgent extends Ens.BusinessOperation
+Class EmailInterop.BO.ToOrderAgent extends Ens.BusinessOperation
 {
     Property HumanReviewTarget As Ens.DataType.ConfigName;
 
@@ -7,15 +7,15 @@ Class Warehouse.Interop.BO.ToOrderAgent extends Ens.BusinessOperation
     XData MessageMap
     {
     <MapItems>
-        <MapItem MessageType="Warehouse.Interop.Messages.MailMessage">
+        <MapItem MessageType="EmailInterop.Messages.MailMessage">
             <Method>OnMessage</Method>
         </MapItem>
     </MapItems>
     }
 
-    Method OnMessage(pInput As Warehouse.Interop.Messages.MailMessage, Output pOut As Ens.Response) As %Status
+    Method OnMessage(pInput As EmailInterop.Messages.MailMessage, Output pOut As Ens.Response) As %Status
     {
-        set agent = ##class(Warehouse.AI.Agents.OrderAgent).%New()
+        set agent = ##class(EmailAI.Agent).%New()
         set sc = agent.%Init()
 
         if $$$ISERR(sc) {
@@ -23,12 +23,12 @@ Class Warehouse.Interop.BO.ToOrderAgent extends Ens.BusinessOperation
         }
 
         set session = agent.CreateSession()
-        
-        set st  = pInput.%JSONExportToString(.prompt) 
-        
+
+        set st  = pInput.%JSONExportToString(.prompt)
+
         set response = agent.Chat(session, prompt)
         d session.%Save()
-        set json = ##class(Warehouse.AI.BaseAgent).ExtractJSON(response.Content)
+        set json = ##class(Utils.JSON).ExtractJSON(response.Content)
 
         try {
             set output = {}.%FromJSON(json)
@@ -41,7 +41,7 @@ Class Warehouse.Interop.BO.ToOrderAgent extends Ens.BusinessOperation
         }
 
         if output.ReviewRequired {
-            set reviewRequest = ##class(Warehouse.Interop.Messages.ReviewRequest).%New()
+            set reviewRequest = ##class(EmailInterop.Messages.ReviewRequest).%New()
             set reviewRequest.Subject  = pInput.Subject
             set reviewRequest.MailFrom = pInput.MailFrom
             set reviewRequest.ReplyTo  = pInput.ReplyTo
@@ -62,7 +62,7 @@ Class Warehouse.Interop.BO.ToOrderAgent extends Ens.BusinessOperation
 
             set reviewRequest.AgentNotes   = output.AgentNotes
             set reviewRequest.ReviewReason = output.ReasonForReview
-            
+
 
             return ..SendRequestAsync(..HumanReviewTarget, reviewRequest)
         }

@@ -1,4 +1,4 @@
-Class Warehouse.Interop.BO.ToHumanReview Extends Ens.BusinessOperation
+Class EmailInterop.BO.ToHumanReview Extends Ens.BusinessOperation
 {
 
 Parameter ADAPTER = "EnsLib.EMail.OutboundAdapter";
@@ -17,16 +17,16 @@ Parameter SETTINGS = "StockReviewEmail:Basic,CreditReviewEmail:Basic,GeneralRevi
 XData MessageMap
 {
 <MapItems>
-        <MapItem MessageType="Warehouse.Interop.Messages.ReviewRequest">
+        <MapItem MessageType="EmailInterop.Messages.ReviewRequest">
             <Method>OnReviewRequest</Method>
         </MapItem>
-        <MapItem MessageType="Warehouse.Interop.Messages.MailMessage">
+        <MapItem MessageType="EmailInterop.Messages.MailMessage">
             <Method>OnMailMessage</Method>
         </MapItem>
     </MapItems>
 }
 
-Method OnReviewRequest(pInput As Warehouse.Interop.Messages.ReviewRequest, Output pOut As Ens.Response) As %Status
+Method OnReviewRequest(pInput As EmailInterop.Messages.ReviewRequest, Output pOut As Ens.Response) As %Status
 {
         $$$LOGINFO("Human review required for message from " _ pInput.MailFrom _ " — reason: " _ pInput.ReviewReason)
 
@@ -40,7 +40,7 @@ Method OnReviewRequest(pInput As Warehouse.Interop.Messages.ReviewRequest, Outpu
         return ..SendReviewEmail(toAddress, "[Review Required] " _ pInput.Subject, body)
 }
 
-Method OnMailMessage(pInput As Warehouse.Interop.Messages.MailMessage, Output pOut As Ens.Response) As %Status
+Method OnMailMessage(pInput As EmailInterop.Messages.MailMessage, Output pOut As Ens.Response) As %Status
 {
         $$$LOGINFO("Human review required for message from " _ pInput.MailFrom _ " — category: " _ pInput.Category)
 
@@ -52,7 +52,7 @@ Method OnMailMessage(pInput As Warehouse.Interop.Messages.MailMessage, Output pO
         return ..SendReviewEmail(toAddress, "[Review Required] " _ pInput.Subject, body)
 }
 
-/// Map a ReviewRequest.Intent value (currently mirrors OrderAgent's ReasonForReview: OutOfStock, UntrustedCustomer, NewCustomer, Other) to a department mailbox.
+/// Map a ReviewRequest.Intent value to a department mailbox.
 Method GetDepartmentEmail(pIntent As %String) As %String
 {
         quit $CASE(pIntent,
@@ -62,7 +62,7 @@ Method GetDepartmentEmail(pIntent As %String) As %String
             : ..GeneralReviewEmail)
 }
 
-Method FormatOriginalMessage(pInput As Warehouse.Interop.Messages.MailMessage) As %String
+Method FormatOriginalMessage(pInput As EmailInterop.Messages.MailMessage) As %String
 {
         set body = ""
         if $IsObject(pInput.TextData) && (pInput.TextData.Size > 0) {

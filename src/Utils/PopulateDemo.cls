@@ -1,7 +1,7 @@
-Class Warehouse.Utils.PopulateDemo
+Class Utils.PopulateDemo
 {
 
-/// Populate all Warehouse data. Call: do ##class(Warehouse.Utils.PopulateDemo).PopulateAll()
+/// Populate all Warehouse data. Call: do ##class(Utils.PopulateDemo).PopulateAll()
 ClassMethod PopulateAll() As %Status
 {
     do ..CleanAll()
@@ -9,19 +9,16 @@ ClassMethod PopulateAll() As %Status
     quit:$$$ISERR(sc) sc
     set sc = ..PopulateCustomers()
     quit:$$$ISERR(sc) sc
-    set sc = ..PopulateContractPrices()
-    quit:$$$ISERR(sc) sc
     set sc = ..PopulateOrders()
     quit sc
 }
 
 ClassMethod CleanAll()
 {
-    do ##class(Warehouse.Data.Order).%KillExtent()
-    do ##class(Warehouse.Data.ContractPrice).%KillExtent()
-    do ##class(Warehouse.Data.Transactions).%KillExtent()
-    do ##class(Warehouse.Data.Product).%KillExtent()
-    do ##class(Warehouse.Data.Customer).%KillExtent()
+    do ##class(Warehouse.Order).%KillExtent()
+    do ##class(Warehouse.Transactions).%KillExtent()
+    do ##class(Warehouse.Product).%KillExtent()
+    do ##class(Warehouse.Customer).%KillExtent()
 }
 
 ClassMethod PopulateProducts() As %Status
@@ -36,7 +33,7 @@ ClassMethod PopulateProducts() As %Status
 
     for i = 1:1:$LISTLENGTH(products) {
         set item = $LIST(products, i)
-        set p = ##class(Warehouse.Data.Product).%New()
+        set p = ##class(Warehouse.Product).%New()
         set p.SKU        = $LIST(item, 1)
         set p.Name       = $LIST(item, 2)
         set p.Category   = $LIST(item, 3)
@@ -47,8 +44,6 @@ ClassMethod PopulateProducts() As %Status
         set p.Active     = $LIST(item, 8)
         set sc = p.%Save()
         quit:$$$ISERR(sc)
-
-
     }
     quit sc
 }
@@ -69,7 +64,7 @@ ClassMethod PopulateCustomers() As %Status
 
     for i = 1:1:$LISTLENGTH(customerData) {
         set item = $LIST(customerData, i)
-        set c = ##class(Warehouse.Data.Customer).%New()
+        set c = ##class(Warehouse.Customer).%New()
         set c.CustomerId              = $LIST(item, 1)
         set c.Organisation            = $LIST(item, 2)
         set c.ContactEmail            = $LIST(item, 3)
@@ -77,44 +72,6 @@ ClassMethod PopulateCustomers() As %Status
         set c.Trusted                 = $LIST(item, 5)
         set c.DefaultDeliveryAddress  = $LIST(item, 6)
         set sc = c.%Save()
-        quit:$$$ISERR(sc)
-    }
-    quit sc
-}
-
-ClassMethod PopulateContractPrices() As %Status
-{
-    set sc = $$$OK
-
-    // columns: CustomerId, SKU, UnitPrice
-    set priceData = $LISTBUILD(
-        $LB("C1001", "TS-400", 72.00),
-        $LB("C1002", "TS-450", 105.00)
-    )
-
-    for i = 1:1:$LISTLENGTH(priceData) {
-        set item = $LIST(priceData, i)
-        set custId = $LIST(item, 1)
-        set sku    = $LIST(item, 2)
-        set price  = $LIST(item, 3)
-
-        set cust = ##class(Warehouse.Data.Customer).%OpenId(custId)
-        if '$ISOBJECT(cust) {
-            write "WARNING: Customer "_custId_" not found, skipping",!
-            continue
-        }
-
-        set prod = ##class(Warehouse.Data.Product).%OpenId(sku)
-        if '$ISOBJECT(prod) {
-            write "WARNING: SKU "_sku_" not found, skipping",!
-            continue
-        }
-
-        set cp = ##class(Warehouse.Data.ContractPrice).%New()
-        set cp.Customer  = cust
-        set cp.Product   = prod
-        set cp.UnitPrice = price
-        set sc = cp.%Save()
         quit:$$$ISERR(sc)
     }
     quit sc
@@ -138,19 +95,19 @@ ClassMethod PopulateOrders() As %Status
         set sku       = $LIST(item, 4)
         set qty       = $LIST(item, 5)
 
-        set cust = ##class(Warehouse.Data.Customer).%OpenId(custId)
+        set cust = ##class(Warehouse.Customer).%OpenId(custId)
         if '$ISOBJECT(cust) {
             write "WARNING: Customer "_custId_" not found, skipping",!
             continue
         }
 
-        set prod = ##class(Warehouse.Data.Product).%OpenId(sku)
+        set prod = ##class(Warehouse.Product).%OpenId(sku)
         if '$ISOBJECT(prod) {
             write "WARNING: SKU "_sku_" not found, skipping",!
             continue
         }
 
-        set order = ##class(Warehouse.Data.Order).%New()
+        set order = ##class(Warehouse.Order).%New()
         set order.Customer        = cust
         set order.OrderDate       = $ZDATEH(orderDate, 3)
         set order.DeliveryAddress = address

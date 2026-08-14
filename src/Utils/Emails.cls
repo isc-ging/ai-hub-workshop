@@ -1,4 +1,4 @@
-Class Warehouse.Utils.Emails Extends %RegisteredObject
+Class Utils.Emails Extends %RegisteredObject
 {
 
     XData EmailOne [MimeType = "application/json"]
@@ -50,19 +50,19 @@ Class Warehouse.Utils.Emails Extends %RegisteredObject
     {
         set emailname = $CASE(id, 1:"EmailOne", 2:"EmailTwo", 3:"EmailThree", 4:"EmailFour", 5:"EmailFive")
 
-        Set xdata = ##class(%Dictionary.XDataDefinition).%OpenId("Warehouse.Utils.Emails||"_emailname)
+        Set xdata = ##class(%Dictionary.XDataDefinition).%OpenId("Utils.Emails||"_emailname)
 
         return {}.%FromJSON(xdata.Data)
     }
 
     ClassMethod ReturnEmailString(id){
-        set obj = ##class(Warehouse.Utils.Emails).ReturnEmail(id)
+        set obj = ##class(Utils.Emails).ReturnEmail(id)
         return obj.%ToJSON()
     }
 
     ClassMethod PrintEmail(id AS %Integer) As %String
     {
-        set email = ##class(Warehouse.Utils.Emails).ReturnEmail(id)
+        set email = ##class(Utils.Emails).ReturnEmail(id)
         Set body = "From: "_email.From_$char(13,10)
         Set body = body_"Subject: "_email.Subject_$char(13,10)
         Set body = body_$char(13,10)

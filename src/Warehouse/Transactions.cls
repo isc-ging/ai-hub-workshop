@@ -1,7 +1,7 @@
-Class Warehouse.Data.Transactions Extends %Persistent
+Class Warehouse.Transactions Extends %Persistent
 {
 
-Property Product As Warehouse.Data.Product [ Required ];
+Property Product As Warehouse.Product [ Required ];
 
 Property Date As %Date [ Required ];
 
@@ -32,11 +32,11 @@ Storage Default
 <Value>Total</Value>
 </Value>
 </Data>
-<DataLocation>^Warehouse.Data.TransactionsD</DataLocation>
+<DataLocation>^Warehouse.TransactionsD</DataLocation>
 <DefaultData>TransactionsDefaultData</DefaultData>
-<IdLocation>^Warehouse.Data.TransactionsD</IdLocation>
-<IndexLocation>^Warehouse.Data.TransactionsI</IndexLocation>
-<StreamLocation>^Warehouse.Data.TransactionsS</StreamLocation>
+<IdLocation>^Warehouse.TransactionsD</IdLocation>
+<IndexLocation>^Warehouse.TransactionsI</IndexLocation>
+<StreamLocation>^Warehouse.TransactionsS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

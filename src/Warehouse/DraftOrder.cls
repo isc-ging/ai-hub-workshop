@@ -1,4 +1,4 @@
-Class Warehouse.Data.DraftOrder Extends Warehouse.Data.Order
+Class Warehouse.DraftOrder Extends Warehouse.Order
 {
 
 Property ReviewRequired As %Boolean [ InitialExpression = 0 ];

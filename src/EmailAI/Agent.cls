@@ -1,21 +1,21 @@
-Class Warehouse.AI.Agent Extends %AI.Agent
+Class EmailAI.Agent Extends %AI.Agent
 {
 
     /// LLM Model
     Parameter MODELCONFIG = "bedrock.claude-haiku-4-5";
 
-    Parameter TOOLSETS = "Warehouse.AI.ToolSet";
+    Parameter TOOLSETS = "EmailAI.ToolSet";
 
-    /// Initialization method. Can be used to set provider, or add stateful tools and policies. 
+    /// Initialization method. Can be used to set provider, or add stateful tools and policies.
     /// Called by `.%Init()`
     Method %OnInit() As %Status{
-        
+
         set sc = $$$OK
         w "Initialising"
         try {
-        
+
         set sc = ##class(%ConfigStore.Configuration).GetDetails("AI.LLM."_..#MODELCONFIG, .details, 0, 1)
-        quit:$$$ISERR(sc) 
+        quit:$$$ISERR(sc)
 
         set ..Provider = ##class(%AI.Provider).Create(details."model_provider", details)
 
@@ -26,10 +26,10 @@ Class Warehouse.AI.Agent Extends %AI.Agent
     }
     quit sc
     }
-    
 
 
-    XData INSTRUCTIONS [MimeType="text/markdown"] { 
+
+    XData INSTRUCTIONS [MimeType="text/markdown"] {
             # Procurement Agent
 
             You process procurement requests received from customers.
@@ -61,7 +61,7 @@ Class Warehouse.AI.Agent Extends %AI.Agent
             - Do not claim that an order has been created.
             - Preserve uncertainty when the email is ambiguous.
 
-            Expected result extract: 
+            Expected result extract:
             ```
             {
                 "intent": "place_order",
@@ -88,7 +88,7 @@ Class Warehouse.AI.Agent Extends %AI.Agent
     ClassMethod ProcessEmail(pEmail as %String) As %DynamicObject
     {
     // Create an initialise agent
-    set agent = ##class(Warehouse.AI.Agent).%New()
+    set agent = ##class(EmailAI.Agent).%New()
     set sc = agent.%Init()
 
     if $$$ISERR(sc){ quit sc} // Error handling
@@ -99,7 +99,7 @@ Class Warehouse.AI.Agent Extends %AI.Agent
 
     do session.%Save() // Save session to DB (Can access later)
 
-    set responseObj = ##class(Warehouse.Utils.JSON).ExtractJSON(response.Content)
+    set responseObj = ##class(Utils.JSON).ExtractJSON(response.Content)
 
     return responseObj
 
